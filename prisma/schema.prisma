@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// Users table (managed by NextAuth)
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  password      String
+  totpSecret    String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  familyMembers  FamilyMember[]
+  profiles       Profile[]
+  wishlistItems  WishlistItem[]
+  createdFamilies Family[]       @relation("FamilyCreator")
+  claimedItems   WishlistItem[]  @relation("ClaimedItems")
+  createdGroups  GiftGroup[]     @relation("GroupCreator")
+  groupMembers   GiftGroupMember[]
+  messages       Message[]
+}
+
+// Account table (for OAuth providers if added later)
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+// Families table
+model Family {
+  id         String   @id @default(cuid())
+  name       String
+  inviteCode String   @unique
+  createdBy  String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  creator      User           @relation("FamilyCreator", fields: [createdBy], references: [id])
+  members      FamilyMember[]
+  profiles     Profile[]
+  wishlistItems WishlistItem[]
+  giftGroups   GiftGroup[]
+}
+
+// Family members junction table
+model FamilyMember {
+  id        String   @id @default(cuid())
+  familyId  String
+  userId    String
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([familyId, userId])
+}
+
+// Profiles (tracking info)
+model Profile {
+  id                   String    @id @default(cuid())
+  userId               String
+  familyId             String
+  shoeSize             String?
+  pantSize             String?
+  shirtSize            String?
+  dressSize            String?
+  ringSize             String?
+  favoriteColors       Json?
+  vehicleMake          String?
+  vehicleModel         String?
+  vehicleYear          Int?
+  hobbies              Json?
+  interests            Json?
+  allergies            String?
+  dietaryRestrictions  String?
+  notes                String?   @db.Text
+  birthday             DateTime?
+  anniversary          DateTime?
+  updatedAt            DateTime  @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family Family @relation(fields: [familyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, familyId])
+}
+
+// Wishlist items
+model WishlistItem {
+  id          String    @id @default(cuid())
+  userId      String
+  familyId    String
+  title       String
+  description String?   @db.Text
+  url         String?
+  price       Decimal?  @db.Decimal(10, 2)
+  imageUrl    String?
+  priority    Priority  @default(MEDIUM)
+  category    String?
+  claimedBy   String?
+  claimedAt   DateTime?
+  purchased   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  family     Family  @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  claimer    User?   @relation("ClaimedItems", fields: [claimedBy], references: [id])
+}
+
+// Gift groups
+model GiftGroup {
+  id            String    @id @default(cuid())
+  familyId      String
+  name          String
+  description   String?   @db.Text
+  occasion      String?
+  occasionDate  DateTime?
+  targetUserId  String?
+  targetAmount  Decimal?  @db.Decimal(10, 2)
+  currentAmount Decimal   @default(0) @db.Decimal(10, 2)
+  isActive      Boolean   @default(true)
+  createdBy     String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  family   Family            @relation(fields: [familyId], references: [id], onDelete: Cascade)
+  creator  User              @relation("GroupCreator", fields: [createdBy], references: [id])
+  members  GiftGroupMember[]
+  messages Message[]
+}
+
+// Gift group members
+model GiftGroupMember {
+  id                 String   @id @default(cuid())
+  giftGroupId        String
+  userId             String
+  contributionAmount Decimal? @db.Decimal(10, 2)
+  hasPaid            Boolean  @default(false)
+  joinedAt           DateTime @default(now())
+
+  giftGroup GiftGroup @relation(fields: [giftGroupId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([giftGroupId, userId])
+}
+
+// Messages
+model Message {
+  id            String   @id @default(cuid())
+  giftGroupId   String
+  userId        String
+  content       String   @db.Text
+  attachmentUrl String?
+  isEdited      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  giftGroup GiftGroup @relation(fields: [giftGroupId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Email verification tokens
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
