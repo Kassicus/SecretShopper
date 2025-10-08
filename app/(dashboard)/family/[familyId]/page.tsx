@@ -15,6 +15,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Crown } from "lucide-react";
 import Link from "next/link";
 import { CopyInviteButton } from "@/components/family/copy-invite-button";
+import { InviteByEmailDialog } from "@/components/family/invite-by-email-dialog";
+import { RemoveMemberButton } from "@/components/family/remove-member-button";
 
 export default async function FamilyDetailPage({
   params,
@@ -91,18 +93,27 @@ export default async function FamilyDetailPage({
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Invite Code</CardTitle>
+            <CardTitle className="text-sm font-medium">Invite Family Members</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <code className="flex-1 rounded bg-muted px-3 py-2 font-mono text-sm">
-                {family.inviteCode}
-              </code>
-              <CopyInviteButton inviteCode={family.inviteCode} />
+          <CardContent className="space-y-4">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <code className="flex-1 rounded bg-muted px-3 py-2 font-mono text-sm">
+                  {family.inviteCode}
+                </code>
+                <CopyInviteButton inviteCode={family.inviteCode} />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Share this code with family members to invite them
+              </p>
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Share this code with family members to invite them
-            </p>
+
+            <div className="pt-2 border-t">
+              <p className="text-sm text-muted-foreground mb-3">
+                Or send an invitation directly via email:
+              </p>
+              <InviteByEmailDialog familyId={familyId} familyName={family.name} />
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -140,6 +151,14 @@ export default async function FamilyDetailPage({
                     )}
                     {member.user.id === session.user.id && (
                       <Badge variant="outline">You</Badge>
+                    )}
+                    {isAdmin && member.user.id !== session.user.id && (
+                      <RemoveMemberButton
+                        familyId={familyId}
+                        memberId={member.id}
+                        memberName={member.user.name || ""}
+                        memberEmail={member.user.email}
+                      />
                     )}
                   </div>
                 </CardContent>

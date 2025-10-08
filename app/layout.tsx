@@ -1,6 +1,18 @@
 import type { Metadata } from "next";
+import { Libre_Baskerville, Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+
+const libreBaskerville = Libre_Baskerville({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-serif",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Secret Shopper - Family Gift Coordinator",
@@ -14,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body className={`${inter.variable} ${libreBaskerville.variable}`}>
         <ThemeProvider defaultTheme="light" storageKey="secret-shopper-theme">
           {children}
         </ThemeProvider>
