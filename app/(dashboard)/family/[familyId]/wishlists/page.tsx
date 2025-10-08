@@ -2,15 +2,7 @@ import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { WishlistItemCard } from "@/components/wishlist/wishlist-item-card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { FamilyWishlistFilters } from "@/components/wishlist/family-wishlist-filters";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -77,7 +69,7 @@ export default async function FamilyWishlistsPage({
     where.priority = selectedPriority;
   }
 
-  const items = await prisma.wishlistItem.findMany({
+  const rawItems = await prisma.wishlistItem.findMany({
     where,
     include: {
       user: {
@@ -101,19 +93,24 @@ export default async function FamilyWishlistsPage({
     ],
   });
 
-  // Filter claimed items for display
-  const filteredItems = items.map((item) => {
+  // Filter claimed items for display and convert Decimal to number
+  const filteredItems = rawItems.map((item) => {
+    const baseItem = {
+      ...item,
+      price: item.price ? Number(item.price) : null,
+    };
+
     if (item.userId === session.user.id) {
       // Owner cannot see claimed status
       return {
-        ...item,
+        ...baseItem,
         claimedBy: null,
         claimedAt: null,
         claimer: null,
         purchased: false,
       };
     }
-    return item;
+    return baseItem;
   });
 
   return (
@@ -134,61 +131,12 @@ export default async function FamilyWishlistsPage({
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-4">
-        <div className="w-64">
-          <Select
-            value={selectedUserId || "all"}
-            onValueChange={(value) => {
-              const url = new URL(window.location.href);
-              if (value === "all") {
-                url.searchParams.delete("userId");
-              } else {
-                url.searchParams.set("userId", value);
-              }
-              window.location.href = url.toString();
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by member" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All members</SelectItem>
-              {family.members
-                .filter((m) => m.user.id !== session.user.id)
-                .map((member) => (
-                  <SelectItem key={member.user.id} value={member.user.id}>
-                    {member.user.name || member.user.email}
-                  </SelectItem>
-                ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="w-48">
-          <Select
-            value={selectedPriority || "all"}
-            onValueChange={(value) => {
-              const url = new URL(window.location.href);
-              if (value === "all") {
-                url.searchParams.delete("priority");
-              } else {
-                url.searchParams.set("priority", value);
-              }
-              window.location.href = url.toString();
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All priorities</SelectItem>
-              <SelectItem value="HIGH">High</SelectItem>
-              <SelectItem value="MEDIUM">Medium</SelectItem>
-              <SelectItem value="LOW">Low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      <FamilyWishlistFilters
+        familyMembers={family.members}
+        currentUserId={session.user.id}
+        selectedUserId={selectedUserId}
+        selectedPriority={selectedPriority}
+      />
 
       {filteredItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12 text-center">

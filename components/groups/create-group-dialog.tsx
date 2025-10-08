@@ -99,7 +99,7 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
           Create Group
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Create Gift Group</DialogTitle>
           <DialogDescription>
@@ -168,26 +168,38 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
 
             <div className="space-y-2">
               <Label>Invite Members</Label>
-              <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
-                {familyMembers
-                  .filter((m) => m.user.id !== currentUserId)
-                  .map((member) => (
-                    <label
-                      key={member.user.id}
-                      className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-accent"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedMembers.includes(member.user.id)}
-                        onChange={() => toggleMember(member.user.id)}
-                        className="h-4 w-4"
-                      />
-                      <span className="text-sm">
-                        {member.user.name || member.user.email}
-                      </span>
-                    </label>
-                  ))}
+              <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3" style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--muted))' }}>
+                {familyMembers.filter((m) => m.user.id !== currentUserId).length === 0 ? (
+                  <p className="text-sm py-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    No other family members to invite. Add more members to your family first.
+                  </p>
+                ) : (
+                  familyMembers
+                    .filter((m) => m.user.id !== currentUserId)
+                    .map((member) => (
+                      <label
+                        key={member.user.id}
+                        className="flex items-center gap-2 cursor-pointer p-2 rounded transition-colors member-checkbox-label"
+                        style={{ color: 'hsl(var(--foreground))' }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedMembers.includes(member.user.id)}
+                          onChange={() => toggleMember(member.user.id)}
+                          className="h-4 w-4 rounded"
+                        />
+                        <span className="text-sm">
+                          {member.user.name || member.user.email}
+                        </span>
+                      </label>
+                    ))
+                )}
               </div>
+              <style jsx>{`
+                .member-checkbox-label:hover {
+                  background-color: hsl(var(--hover));
+                }
+              `}</style>
             </div>
 
             {error && (
