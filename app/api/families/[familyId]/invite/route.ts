@@ -10,7 +10,7 @@ const inviteEmailSchema = z.object({
 
 export async function POST(
   req: Request,
-  { params }: { params: { familyId: string } }
+  { params }: { params: Promise<{ familyId: string }> }
 ) {
   try {
     const session = await auth();
@@ -19,7 +19,7 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { familyId } = params;
+    const { familyId } = await params;
 
     // Check if user is a member of the family
     const membership = await prisma.familyMember.findUnique({

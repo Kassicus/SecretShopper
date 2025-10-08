@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { familyId: string; memberId: string } }
+  { params }: { params: Promise<{ familyId: string; memberId: string }> }
 ) {
   try {
     const session = await auth();
@@ -13,7 +13,7 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { familyId, memberId } = params;
+    const { familyId, memberId } = await params;
 
     // Check if the requesting user is an admin of the family
     const requestingMember = await prisma.familyMember.findUnique({
