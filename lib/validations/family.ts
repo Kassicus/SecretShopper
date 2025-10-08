@@ -10,7 +10,11 @@ export const createFamilySchema = z.object({
 export const joinFamilySchema = z.object({
   inviteCode: z
     .string()
-    .regex(/^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/, "Invalid invite code format"),
+    .transform((val) => val.toUpperCase().trim())
+    .refine(
+      (val) => /^[A-HJ-NP-Z2-9]{4}-[A-HJ-NP-Z2-9]{4}$/.test(val),
+      "Invalid invite code format (should be XXXX-XXXX)"
+    ),
 });
 
 export const updateFamilySchema = z.object({
