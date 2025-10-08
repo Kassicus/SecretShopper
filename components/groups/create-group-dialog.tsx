@@ -99,7 +99,7 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
           Create Group
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Create Gift Group</DialogTitle>
           <DialogDescription>
@@ -107,22 +107,23 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Group Name *</Label>
+          <div className="space-y-6 px-6 py-6">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-base">Group Name *</Label>
               <Input
                 id="name"
                 placeholder="Birthday gift for Mom"
                 {...register("name")}
                 disabled={isLoading}
+                className="h-11"
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive font-medium">{errors.name.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
+            <div className="space-y-3">
+              <Label htmlFor="description" className="text-base">Description</Label>
               <Textarea
                 id="description"
                 placeholder="What are we buying?"
@@ -132,29 +133,31 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="occasion">Occasion</Label>
+              <div className="space-y-3">
+                <Label htmlFor="occasion" className="text-base">Occasion</Label>
                 <Input
                   id="occasion"
                   placeholder="Birthday, Christmas, etc."
                   {...register("occasion")}
                   disabled={isLoading}
+                  className="h-11"
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="occasionDate">Date</Label>
+              <div className="space-y-3">
+                <Label htmlFor="occasionDate" className="text-base">Date</Label>
                 <Input
                   id="occasionDate"
                   type="date"
                   {...register("occasionDate")}
                   disabled={isLoading}
+                  className="h-11"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="targetAmount">Target Amount ($)</Label>
+            <div className="space-y-3">
+              <Label htmlFor="targetAmount" className="text-base">Target Amount ($)</Label>
               <Input
                 id="targetAmount"
                 type="number"
@@ -163,14 +166,15 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
                 placeholder="0.00"
                 {...register("targetAmount", { valueAsNumber: true })}
                 disabled={isLoading}
+                className="h-11"
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Invite Members</Label>
-              <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3" style={{ borderColor: 'hsl(var(--border))', backgroundColor: 'hsl(var(--muted))' }}>
+            <div className="space-y-3">
+              <Label className="text-base">Invite Members</Label>
+              <div className="space-y-2 max-h-48 overflow-y-auto border border-border rounded-md p-3 bg-muted">
                 {familyMembers.filter((m) => m.user.id !== currentUserId).length === 0 ? (
-                  <p className="text-sm py-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  <p className="text-sm py-2 text-muted-foreground">
                     No other family members to invite. Add more members to your family first.
                   </p>
                 ) : (
@@ -179,8 +183,7 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
                     .map((member) => (
                       <label
                         key={member.user.id}
-                        className="flex items-center gap-2 cursor-pointer p-2 rounded transition-colors member-checkbox-label"
-                        style={{ color: 'hsl(var(--foreground))' }}
+                        className="flex items-center gap-2 cursor-pointer p-2 rounded transition-colors hover:bg-accent text-foreground"
                       >
                         <input
                           type="checkbox"
@@ -195,22 +198,17 @@ export function CreateGroupDialog({ familyId, familyMembers, currentUserId }: Cr
                     ))
                 )}
               </div>
-              <style jsx>{`
-                .member-checkbox-label:hover {
-                  background-color: hsl(var(--hover));
-                }
-              `}</style>
             </div>
 
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-destructive/50">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
           </div>
 
           <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="min-w-[140px]">
               {isLoading ? "Creating..." : "Create Group"}
             </Button>
           </DialogFooter>

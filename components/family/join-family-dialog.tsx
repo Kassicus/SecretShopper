@@ -71,7 +71,7 @@ export function JoinFamilyDialog() {
           Join Family
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Join a family</DialogTitle>
           <DialogDescription>
@@ -79,33 +79,33 @@ export function JoinFamilyDialog() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="inviteCode">Invite Code</Label>
+          <div className="space-y-6 px-6 py-6">
+            <div className="space-y-3">
+              <Label htmlFor="inviteCode" className="text-base">Invite Code</Label>
               <Input
                 id="inviteCode"
                 placeholder="XXXX-XXXX"
-                className="font-mono uppercase"
+                className="font-mono uppercase h-11"
                 {...register("inviteCode")}
                 disabled={isLoading}
                 maxLength={9}
               />
               {errors.inviteCode && (
-                <p className="text-sm text-destructive">
+                <p className="text-sm text-destructive font-medium">
                   {errors.inviteCode.message}
                 </p>
               )}
             </div>
 
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-destructive/50">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
           </div>
 
           <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="min-w-[140px]">
               {isLoading ? "Joining..." : "Join Family"}
             </Button>
           </DialogFooter>
