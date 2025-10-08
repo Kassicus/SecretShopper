@@ -11,7 +11,7 @@ import { Users, Calendar, DollarSign } from "lucide-react";
 export default async function GroupsPage({
   searchParams,
 }: {
-  searchParams: { familyId?: string };
+  searchParams: Promise<{ familyId?: string }>;
 }) {
   const session = await auth();
 
@@ -19,7 +19,8 @@ export default async function GroupsPage({
     redirect("/login");
   }
 
-  const familyId = searchParams.familyId;
+  const resolvedSearchParams = await searchParams;
+  const familyId = resolvedSearchParams.familyId;
 
   if (!familyId) {
     // Show family selector

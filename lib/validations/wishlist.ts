@@ -13,7 +13,7 @@ export const wishlistItemSchema = z.object({
     .optional()
     .nullable(),
   imageUrl: z.string().url("Invalid image URL").optional().or(z.literal("")),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional(),
   category: z.string().optional(),
 });
 

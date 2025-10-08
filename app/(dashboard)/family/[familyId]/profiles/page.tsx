@@ -17,7 +17,7 @@ import Link from "next/link";
 export default async function FamilyProfilesPage({
   params,
 }: {
-  params: { familyId: string };
+  params: Promise<{ familyId: string }>;
 }) {
   const session = await auth();
 
@@ -25,8 +25,10 @@ export default async function FamilyProfilesPage({
     redirect("/login");
   }
 
+  const { familyId } = await params;
+
   const family = await prisma.family.findUnique({
-    where: { id: params.familyId },
+    where: { id: familyId },
     include: {
       members: {
         include: {
@@ -58,7 +60,7 @@ export default async function FamilyProfilesPage({
 
   // Get all profiles for this family
   const profiles = await prisma.profile.findMany({
-    where: { familyId: params.familyId },
+    where: { familyId },
     include: {
       user: {
         select: {
@@ -78,7 +80,7 @@ export default async function FamilyProfilesPage({
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <Link
-          href={`/family/${params.familyId}`}
+          href={`/family/${familyId}`}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -120,7 +122,7 @@ export default async function FamilyProfilesPage({
                   </div>
                 </div>
                 {isCurrentUser && (
-                  <Link href={`/profile/edit/${params.familyId}`}>
+                  <Link href={`/profile/edit/${familyId}`}>
                     <Button variant="outline">Edit Profile</Button>
                   </Link>
                 )}

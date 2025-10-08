@@ -26,7 +26,7 @@ async function updateContribution(groupId: string, amount: number, hasPaid: bool
 export default async function GroupDetailPage({
   params,
 }: {
-  params: { groupId: string };
+  params: Promise<{ groupId: string }>;
 }) {
   const session = await auth();
 
@@ -34,8 +34,10 @@ export default async function GroupDetailPage({
     redirect("/login");
   }
 
+  const { groupId } = await params;
+
   const group = await prisma.giftGroup.findUnique({
-    where: { id: params.groupId },
+    where: { id: groupId },
     include: {
       creator: {
         select: {
@@ -238,7 +240,7 @@ export default async function GroupDetailPage({
                   if (!session?.user) return;
 
                   await fetch(
-                    `${process.env.NEXTAUTH_URL}/api/groups/${params.groupId}/contribute`,
+                    `${process.env.NEXTAUTH_URL}/api/groups/${groupId}/contribute`,
                     {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
@@ -282,7 +284,7 @@ export default async function GroupDetailPage({
         {/* Right Column - Chat */}
         <div>
           <GroupChat
-            groupId={params.groupId}
+            groupId={groupId}
             initialMessages={group.messages}
             currentUserId={session.user.id}
           />
