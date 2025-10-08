@@ -71,7 +71,7 @@ export function CreateFamilyDialog() {
           Create Family
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]" onInteractOutside={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Create a new family</DialogTitle>
           <DialogDescription>
@@ -79,29 +79,30 @@ export function CreateFamilyDialog() {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Family Name</Label>
+          <div className="space-y-6 px-6 py-6">
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-base">Family Name</Label>
               <Input
                 id="name"
                 placeholder="Smith Family"
                 {...register("name")}
                 disabled={isLoading}
+                className="h-11"
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive font-medium">{errors.name.message}</p>
               )}
             </div>
 
             {error && (
-              <Alert variant="destructive">
+              <Alert variant="destructive" className="border-destructive/50">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
           </div>
 
           <DialogFooter>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="min-w-[140px]">
               {isLoading ? "Creating..." : "Create Family"}
             </Button>
           </DialogFooter>

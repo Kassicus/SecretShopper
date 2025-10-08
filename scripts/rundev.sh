@@ -81,10 +81,10 @@ if grep -q "prisma+postgres://localhost" .env; then
     echo ""
 fi
 
-# Run migrations
-echo "🔄 Running database migrations..."
-npm run prisma:migrate
-echo "✓ Migrations complete"
+# Ensure Prisma Client is up to date
+echo "🔄 Ensuring Prisma Client is up to date..."
+npm run prisma:generate
+echo "✓ Prisma Client ready"
 echo ""
 
 echo "======================================"

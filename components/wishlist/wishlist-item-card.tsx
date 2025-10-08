@@ -141,29 +141,38 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
   };
 
   return (
-    <Card className={item.purchased && isClaimedByMe ? "opacity-60" : ""}>
-      <CardHeader>
+    <Card className={`overflow-hidden ${item.purchased && isClaimedByMe ? "opacity-60" : ""}`}>
+      {/* Solid accent bar at top */}
+      <div className={`h-1 ${
+        item.priority === "HIGH"
+          ? "bg-destructive"
+          : item.priority === "MEDIUM"
+          ? "bg-accent"
+          : "bg-secondary"
+      }`} />
+
+      <CardHeader className="bg-muted/20">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-xl">
               {item.title}
               {item.purchased && isClaimedByMe && (
-                <Badge variant="outline" className="text-green-600">
+                <Badge variant="outline" className="text-green-600 border-green-600 bg-green-50 dark:bg-green-950/30">
                   <Check className="mr-1 h-3 w-3" />
                   Purchased
                 </Badge>
               )}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-2">
               {!isOwner && `${item.user.name || item.user.email}'s wishlist`}
             </CardDescription>
           </div>
-          <div className="flex gap-1">
-            <Badge variant={getPriorityColor(item.priority)}>
+          <div className="flex gap-1 flex-col sm:flex-row">
+            <Badge variant={getPriorityColor(item.priority)} className="shadow-sm">
               {item.priority}
             </Badge>
             {isClaimedByMe && !item.purchased && (
-              <Badge variant="outline" className="text-blue-600">
+              <Badge variant="outline" className="text-blue-600 border-blue-600 bg-blue-50 dark:bg-blue-950/30 shadow-sm">
                 <Gift className="mr-1 h-3 w-3" />
                 Claimed
               </Badge>
@@ -173,38 +182,48 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
       </CardHeader>
 
       {(item.description || item.imageUrl || item.price || item.category) && (
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4 pt-6">
           {item.imageUrl && (
-            <img
-              src={item.imageUrl}
-              alt={item.title}
-              className="w-full h-48 object-cover rounded-md"
-            />
+            <div className="relative overflow-hidden rounded-lg border-2 border-accent/20 shadow-md">
+              <img
+                src={item.imageUrl}
+                alt={item.title}
+                className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+              />
+            </div>
           )}
           {item.description && (
-            <p className="text-sm text-muted-foreground">{item.description}</p>
+            <div className="rounded-lg bg-muted/50 p-4 border-l-4 border-accent">
+              <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+            </div>
           )}
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-3 text-sm">
             {item.price && (
-              <span className="font-semibold">${Number(item.price).toFixed(2)}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20">
+                <span className="font-bold text-primary text-base">${Number(item.price).toFixed(2)}</span>
+              </div>
             )}
-            {item.category && <Badge variant="outline">{item.category}</Badge>}
+            {item.category && (
+              <Badge variant="outline" className="shadow-sm bg-accent/10 border-accent/30">
+                {item.category}
+              </Badge>
+            )}
           </div>
         </CardContent>
       )}
 
-      <CardFooter className="flex gap-2">
+      <CardFooter className="flex gap-2 bg-muted/20 border-t">
         {isOwner ? (
           <>
             <Link href={`/wishlist/edit/${item.id}?familyId=${familyId}`}>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="shadow-sm hover:shadow-md transition-all">
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
               </Button>
             </Link>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={isDeleting}>
+                <Button variant="destructive" size="sm" disabled={isDeleting} className="shadow-sm hover:shadow-md transition-all">
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete
                 </Button>
@@ -234,6 +253,7 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                       size="sm"
                       onClick={handleMarkPurchased}
                       disabled={isPurchasing}
+                      className="shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90"
                     >
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       Mark Purchased
@@ -243,6 +263,7 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                       size="sm"
                       onClick={handleUnclaim}
                       disabled={isClaiming}
+                      className="shadow-sm hover:shadow-md transition-all"
                     >
                       Unclaim
                     </Button>
@@ -250,17 +271,17 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                 )}
               </>
             ) : !isClaimed ? (
-              <Button size="sm" onClick={handleClaim} disabled={isClaiming}>
+              <Button size="sm" onClick={handleClaim} disabled={isClaiming} className="shadow-sm hover:shadow-md transition-all bg-accent hover:bg-accent/90 text-accent-foreground">
                 <Gift className="mr-2 h-4 w-4" />
                 Claim Item
               </Button>
             ) : (
-              <Badge variant="outline">Already claimed by someone else</Badge>
+              <Badge variant="outline" className="bg-muted">Already claimed by someone else</Badge>
             )}
           </>
         )}
         {item.url && (
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild className="hover:bg-accent/10 transition-all">
             <a href={item.url} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4" />
             </a>

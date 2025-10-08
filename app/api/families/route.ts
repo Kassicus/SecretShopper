@@ -65,6 +65,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Verify the user exists in the database
+    const userExists = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
+
+    if (!userExists) {
+      console.error("User not found in database:", session.user.id);
+      return NextResponse.json(
+        { error: "User account not found. Please log out and log back in." },
+        { status: 400 }
+      );
+    }
+
     const body = await req.json();
     const validatedData = createFamilySchema.parse(body);
 
@@ -121,6 +134,7 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
+    console.error("Error creating family:", error);
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
