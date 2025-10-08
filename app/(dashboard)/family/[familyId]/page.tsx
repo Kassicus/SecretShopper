@@ -19,7 +19,7 @@ import { CopyInviteButton } from "@/components/family/copy-invite-button";
 export default async function FamilyDetailPage({
   params,
 }: {
-  params: { familyId: string };
+  params: Promise<{ familyId: string }>;
 }) {
   const session = await auth();
 
@@ -27,8 +27,10 @@ export default async function FamilyDetailPage({
     redirect("/login");
   }
 
+  const { familyId } = await params;
+
   const family = await prisma.family.findUnique({
-    where: { id: params.familyId },
+    where: { id: familyId },
     include: {
       members: {
         include: {
@@ -81,7 +83,7 @@ export default async function FamilyDetailPage({
             </p>
           </div>
           {isAdmin && (
-            <Link href={`/family/${family.id}/settings`}>
+            <Link href={`/family/${familyId}/settings`}>
               <Button variant="outline">Settings</Button>
             </Link>
           )}
@@ -157,7 +159,7 @@ export default async function FamilyDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href={`/family/${family.id}/profiles`}>
+              <Link href={`/family/${familyId}/profiles`}>
                 <Button variant="outline" className="w-full">
                   View Profiles
                 </Button>
@@ -173,7 +175,7 @@ export default async function FamilyDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href={`/family/${family.id}/wishlists`}>
+              <Link href={`/family/${familyId}/wishlists`}>
                 <Button variant="outline" className="w-full">
                   View Wishlists
                 </Button>

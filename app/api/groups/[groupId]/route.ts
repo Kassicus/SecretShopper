@@ -5,9 +5,10 @@ import { updateGiftGroupSchema } from "@/lib/validations/gift-group";
 
 export async function GET(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -15,7 +16,7 @@ export async function GET(
     }
 
     const group = await prisma.giftGroup.findUnique({
-      where: { id: params.groupId },
+      where: { id: groupId },
       include: {
         creator: {
           select: {
@@ -82,9 +83,10 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -92,7 +94,7 @@ export async function PATCH(
     }
 
     const group = await prisma.giftGroup.findUnique({
-      where: { id: params.groupId },
+      where: { id: groupId },
     });
 
     if (!group) {
@@ -115,7 +117,7 @@ export async function PATCH(
       : undefined;
 
     const updatedGroup = await prisma.giftGroup.update({
-      where: { id: params.groupId },
+      where: { id: groupId },
       data: {
         ...validatedData,
         occasionDate,
@@ -139,9 +141,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -149,7 +152,7 @@ export async function DELETE(
     }
 
     const group = await prisma.giftGroup.findUnique({
-      where: { id: params.groupId },
+      where: { id: groupId },
     });
 
     if (!group) {
@@ -165,7 +168,7 @@ export async function DELETE(
     }
 
     await prisma.giftGroup.delete({
-      where: { id: params.groupId },
+      where: { id: groupId },
     });
 
     return NextResponse.json({

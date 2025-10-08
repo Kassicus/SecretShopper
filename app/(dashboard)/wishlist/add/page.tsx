@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function AddWishlistItemPage({
   searchParams,
 }: {
-  searchParams: { familyId?: string };
+  searchParams: Promise<{ familyId?: string }>;
 }) {
   const session = await auth();
 
@@ -16,7 +16,8 @@ export default async function AddWishlistItemPage({
     redirect("/login");
   }
 
-  const familyId = searchParams.familyId;
+  const resolvedSearchParams = await searchParams;
+  const familyId = resolvedSearchParams.familyId;
 
   if (!familyId) {
     redirect("/wishlist");

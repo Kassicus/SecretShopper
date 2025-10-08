@@ -5,9 +5,10 @@ import { wishlistItemSchema } from "@/lib/validations/wishlist";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    const { itemId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -15,7 +16,7 @@ export async function PATCH(
     }
 
     const item = await prisma.wishlistItem.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     if (!item) {
@@ -34,7 +35,7 @@ export async function PATCH(
     const validatedData = wishlistItemSchema.parse(body);
 
     const updatedItem = await prisma.wishlistItem.update({
-      where: { id: params.itemId },
+      where: { id: itemId },
       data: {
         ...validatedData,
         url: validatedData.url || null,
@@ -59,9 +60,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    const { itemId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -69,7 +71,7 @@ export async function DELETE(
     }
 
     const item = await prisma.wishlistItem.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     if (!item) {
@@ -85,7 +87,7 @@ export async function DELETE(
     }
 
     await prisma.wishlistItem.delete({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     return NextResponse.json({

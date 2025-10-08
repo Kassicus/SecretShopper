@@ -8,7 +8,7 @@ import Link from "next/link";
 export default async function EditProfilePage({
   params,
 }: {
-  params: { familyId: string };
+  params: Promise<{ familyId: string }>;
 }) {
   const session = await auth();
 
@@ -16,10 +16,12 @@ export default async function EditProfilePage({
     redirect("/login");
   }
 
+  const { familyId } = await params;
+
   // Check if user is a member of this family
   const member = await prisma.familyMember.findFirst({
     where: {
-      familyId: params.familyId,
+      familyId,
       userId: session.user.id,
     },
   });
@@ -29,14 +31,14 @@ export default async function EditProfilePage({
   }
 
   const family = await prisma.family.findUnique({
-    where: { id: params.familyId },
+    where: { id: familyId },
   });
 
   const profile = await prisma.profile.findUnique({
     where: {
       userId_familyId: {
         userId: session.user.id,
-        familyId: params.familyId,
+        familyId,
       },
     },
   });
@@ -62,7 +64,7 @@ export default async function EditProfilePage({
         </p>
       </div>
 
-      <ProfileForm familyId={params.familyId} initialData={profile} />
+      <ProfileForm familyId={familyId} initialData={profile} />
     </div>
   );
 }

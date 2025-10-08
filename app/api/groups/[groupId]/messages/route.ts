@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -16,7 +17,7 @@ export async function GET(
     // Check if user is a member
     const member = await prisma.giftGroupMember.findFirst({
       where: {
-        giftGroupId: params.groupId,
+        giftGroupId: groupId,
         userId: session.user.id,
       },
     });
@@ -29,7 +30,7 @@ export async function GET(
     }
 
     const messages = await prisma.message.findMany({
-      where: { giftGroupId: params.groupId },
+      where: { giftGroupId: groupId },
       include: {
         user: {
           select: {
@@ -57,9 +58,10 @@ export async function GET(
 
 export async function POST(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -69,7 +71,7 @@ export async function POST(
     // Check if user is a member
     const member = await prisma.giftGroupMember.findFirst({
       where: {
-        giftGroupId: params.groupId,
+        giftGroupId: groupId,
         userId: session.user.id,
       },
     });
@@ -93,7 +95,7 @@ export async function POST(
 
     const message = await prisma.message.create({
       data: {
-        giftGroupId: params.groupId,
+        giftGroupId: groupId,
         userId: session.user.id,
         content: content.trim(),
       },

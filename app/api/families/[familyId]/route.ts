@@ -5,9 +5,10 @@ import { updateFamilySchema } from "@/lib/validations/family";
 
 export async function GET(
   req: Request,
-  { params }: { params: { familyId: string } }
+  { params }: { params: Promise<{ familyId: string }> }
 ) {
   try {
+    const { familyId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -15,7 +16,7 @@ export async function GET(
     }
 
     const family = await prisma.family.findUnique({
-      where: { id: params.familyId },
+      where: { id: familyId },
       include: {
         members: {
           include: {
@@ -67,9 +68,10 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { familyId: string } }
+  { params }: { params: Promise<{ familyId: string }> }
 ) {
   try {
+    const { familyId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -82,7 +84,7 @@ export async function PATCH(
     // Check if user is admin
     const member = await prisma.familyMember.findFirst({
       where: {
-        familyId: params.familyId,
+        familyId: familyId,
         userId: session.user.id,
       },
     });
@@ -95,7 +97,7 @@ export async function PATCH(
     }
 
     const family = await prisma.family.update({
-      where: { id: params.familyId },
+      where: { id: familyId },
       data: {
         name: validatedData.name,
       },
@@ -132,9 +134,10 @@ export async function PATCH(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { familyId: string } }
+  { params }: { params: Promise<{ familyId: string }> }
 ) {
   try {
+    const { familyId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -144,7 +147,7 @@ export async function DELETE(
     // Check if user is admin
     const member = await prisma.familyMember.findFirst({
       where: {
-        familyId: params.familyId,
+        familyId: familyId,
         userId: session.user.id,
       },
     });
@@ -158,7 +161,7 @@ export async function DELETE(
 
     // Delete family (cascade will remove members)
     await prisma.family.delete({
-      where: { id: params.familyId },
+      where: { id: familyId },
     });
 
     return NextResponse.json({

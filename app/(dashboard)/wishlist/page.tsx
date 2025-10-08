@@ -9,7 +9,7 @@ import { Plus } from "lucide-react";
 export default async function WishlistPage({
   searchParams,
 }: {
-  searchParams: { familyId?: string };
+  searchParams: Promise<{ familyId?: string }>;
 }) {
   const session = await auth();
 
@@ -17,7 +17,8 @@ export default async function WishlistPage({
     redirect("/login");
   }
 
-  const familyId = searchParams.familyId;
+  const resolvedSearchParams = await searchParams;
+  const familyId = resolvedSearchParams.familyId;
 
   if (!familyId) {
     // Show family selector

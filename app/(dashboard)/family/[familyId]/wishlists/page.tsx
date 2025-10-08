@@ -10,8 +10,8 @@ export default async function FamilyWishlistsPage({
   params,
   searchParams,
 }: {
-  params: { familyId: string };
-  searchParams: { userId?: string; priority?: string };
+  params: Promise<{ familyId: string }>;
+  searchParams: Promise<{ userId?: string; priority?: string }>;
 }) {
   const session = await auth();
 
@@ -19,8 +19,11 @@ export default async function FamilyWishlistsPage({
     redirect("/login");
   }
 
+  const { familyId } = await params;
+  const resolvedSearchParams = await searchParams;
+
   const family = await prisma.family.findUnique({
-    where: { id: params.familyId },
+    where: { id: familyId },
     include: {
       members: {
         include: {
@@ -50,12 +53,12 @@ export default async function FamilyWishlistsPage({
     redirect("/family");
   }
 
-  const selectedUserId = searchParams.userId;
-  const selectedPriority = searchParams.priority;
+  const selectedUserId = resolvedSearchParams.userId;
+  const selectedPriority = resolvedSearchParams.priority;
 
   // Build query
   const where: any = {
-    familyId: params.familyId,
+    familyId,
   };
 
   if (selectedUserId) {
@@ -117,7 +120,7 @@ export default async function FamilyWishlistsPage({
     <div className="container mx-auto p-6">
       <div className="mb-6">
         <Link
-          href={`/family/${params.familyId}`}
+          href={`/family/${familyId}`}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -154,7 +157,7 @@ export default async function FamilyWishlistsPage({
               key={item.id}
               item={item}
               currentUserId={session.user.id}
-              familyId={params.familyId}
+              familyId={familyId}
             />
           ))}
         </div>

@@ -9,8 +9,8 @@ export default async function EditWishlistItemPage({
   params,
   searchParams,
 }: {
-  params: { itemId: string };
-  searchParams: { familyId?: string };
+  params: Promise<{ itemId: string }>;
+  searchParams: Promise<{ familyId?: string }>;
 }) {
   const session = await auth();
 
@@ -18,8 +18,11 @@ export default async function EditWishlistItemPage({
     redirect("/login");
   }
 
+  const { itemId } = await params;
+  const resolvedSearchParams = await searchParams;
+
   const item = await prisma.wishlistItem.findUnique({
-    where: { id: params.itemId },
+    where: { id: itemId },
   });
 
   if (!item) {
@@ -31,7 +34,7 @@ export default async function EditWishlistItemPage({
     redirect("/wishlist");
   }
 
-  const familyId = searchParams.familyId || item.familyId;
+  const familyId = resolvedSearchParams.familyId || item.familyId;
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">

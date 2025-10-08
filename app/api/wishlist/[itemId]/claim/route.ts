@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    const { itemId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -14,7 +15,7 @@ export async function POST(
     }
 
     const item = await prisma.wishlistItem.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     if (!item) {
@@ -39,7 +40,7 @@ export async function POST(
 
     // Claim the item
     const updatedItem = await prisma.wishlistItem.update({
-      where: { id: params.itemId },
+      where: { id: itemId },
       data: {
         claimedBy: session.user.id,
         claimedAt: new Date(),
@@ -61,9 +62,10 @@ export async function POST(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> }
 ) {
   try {
+    const { itemId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -71,7 +73,7 @@ export async function DELETE(
     }
 
     const item = await prisma.wishlistItem.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     if (!item) {
@@ -88,7 +90,7 @@ export async function DELETE(
 
     // Unclaim the item
     const updatedItem = await prisma.wishlistItem.update({
-      where: { id: params.itemId },
+      where: { id: itemId },
       data: {
         claimedBy: null,
         claimedAt: null,

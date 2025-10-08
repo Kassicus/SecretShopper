@@ -6,9 +6,10 @@ import { Decimal } from "@/lib/generated/prisma/runtime/library";
 
 export async function POST(
   req: Request,
-  { params }: { params: { groupId: string } }
+  { params }: { params: Promise<{ groupId: string }> }
 ) {
   try {
+    const { groupId } = await params;
     const session = await auth();
 
     if (!session?.user) {
@@ -21,7 +22,7 @@ export async function POST(
     // Find the member
     const member = await prisma.giftGroupMember.findFirst({
       where: {
-        giftGroupId: params.groupId,
+        giftGroupId: groupId,
         userId: session.user.id,
       },
     });
@@ -34,7 +35,7 @@ export async function POST(
     }
 
     const group = await prisma.giftGroup.findUnique({
-      where: { id: params.groupId },
+      where: { id: groupId },
     });
 
     if (!group) {
@@ -58,7 +59,7 @@ export async function POST(
         },
       }),
       prisma.giftGroup.update({
-        where: { id: params.groupId },
+        where: { id: groupId },
         data: {
           currentAmount: {
             increment: new Decimal(difference),

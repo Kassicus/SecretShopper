@@ -50,7 +50,7 @@ export function WishlistItemForm({ familyId, initialData, itemId }: WishlistItem
       url: initialData?.url || "",
       price: initialData?.price || null,
       imageUrl: initialData?.imageUrl || "",
-      priority: initialData?.priority || "MEDIUM",
+      priority: (initialData?.priority || "MEDIUM") as "LOW" | "MEDIUM" | "HIGH",
       category: initialData?.category || "",
     },
   });
