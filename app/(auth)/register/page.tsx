@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,17 +20,26 @@ import {
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const inviteCode = searchParams.get("inviteCode");
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
   });
+
+  useEffect(() => {
+    if (inviteCode) {
+      setValue("inviteCode", inviteCode);
+    }
+  }, [inviteCode, setValue]);
 
   const onSubmit = async (data: RegisterInput) => {
     try {
@@ -68,7 +77,9 @@ export default function RegisterPage() {
         <CardHeader>
           <CardTitle>Create an account</CardTitle>
           <CardDescription>
-            Enter your information to get started
+            {inviteCode
+              ? "You've been invited to join a family! Create your account to get started."
+              : "Enter your information to get started"}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
