@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Crown, Copy, Check } from "lucide-react";
+import { Crown } from "lucide-react";
 import Link from "next/link";
+import { CopyInviteButton } from "@/components/family/copy-invite-button";
 
 export default async function FamilyDetailPage({
   params,
@@ -95,15 +96,7 @@ export default async function FamilyDetailPage({
               <code className="flex-1 rounded bg-muted px-3 py-2 font-mono text-sm">
                 {family.inviteCode}
               </code>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  navigator.clipboard.writeText(family.inviteCode);
-                }}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+              <CopyInviteButton inviteCode={family.inviteCode} />
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
               Share this code with family members to invite them

@@ -85,7 +85,7 @@ export default async function WishlistPage({
     redirect("/wishlist");
   }
 
-  const items = await prisma.wishlistItem.findMany({
+  const rawItems = await prisma.wishlistItem.findMany({
     where: {
       familyId,
       userId: session.user.id,
@@ -105,6 +105,12 @@ export default async function WishlistPage({
       { createdAt: "desc" },
     ],
   });
+
+  // Convert Decimal to number for Client Components
+  const items = rawItems.map((item) => ({
+    ...item,
+    price: item.price ? Number(item.price) : null,
+  }));
 
   return (
     <div className="container mx-auto p-6">
