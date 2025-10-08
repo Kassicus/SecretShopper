@@ -52,7 +52,16 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { email } = inviteEmailSchema.parse(body);
+    const validation = inviteEmailSchema.safeParse(body);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.issues[0].message },
+        { status: 400 }
+      );
+    }
+
+    const { email } = validation.data;
 
     // Check if user with this email already exists and is in the family
     const existingUser = await prisma.user.findUnique({
@@ -100,12 +109,6 @@ export async function POST(
     );
   } catch (error) {
     console.error("Error sending invitation:", error);
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: error.errors[0].message },
-        { status: 400 }
-      );
-    }
     return NextResponse.json(
       { error: "Failed to send invitation" },
       { status: 500 }
