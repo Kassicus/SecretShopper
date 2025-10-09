@@ -194,8 +194,8 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
             <CardTitle className="flex items-center gap-2 text-xl">
               {item.title}
               {item.purchased && isClaimedByMe && (
-                <Badge variant="outline" className="text-green-600 border-green-600 bg-green-50 dark:bg-green-950/30">
-                  <Check className="mr-1 h-3 w-3" />
+                <Badge variant="outline" className="text-primary border-primary bg-primary/10">
+                  <Check className="mr-1 h-3 w-3 text-primary" />
                   Purchased
                 </Badge>
               )}
@@ -209,8 +209,8 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
               {item.priority}
             </Badge>
             {isClaimedByMe && !item.purchased && (
-              <Badge variant="outline" className="text-blue-600 border-blue-600 bg-blue-50 dark:bg-blue-950/30 shadow-sm">
-                <Gift className="mr-1 h-3 w-3" />
+              <Badge variant="outline" className="text-secondary border-secondary bg-secondary/10 shadow-sm">
+                <Gift className="mr-1 h-3 w-3 text-secondary" />
                 Claimed
               </Badge>
             )}
@@ -342,7 +342,7 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                       disabled={isPurchasing}
                       className="shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90"
                     >
-                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      <ShoppingCart className="mr-2 h-4 w-4 text-primary-foreground" />
                       Mark Purchased
                     </Button>
                     <Button
@@ -358,8 +358,8 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                 )}
               </>
             ) : !isClaimed ? (
-              <Button size="sm" onClick={handleClaim} disabled={isClaiming} className="shadow-sm hover:shadow-md transition-all bg-accent hover:bg-accent/90 text-accent-foreground">
-                <Gift className="mr-2 h-4 w-4" />
+              <Button size="sm" onClick={handleClaim} disabled={isClaiming} className="shadow-sm hover:shadow-md transition-all bg-secondary hover:bg-secondary/90 text-secondary-foreground">
+                <Gift className="mr-2 h-4 w-4 text-secondary-foreground" />
                 Claim Item
               </Button>
             ) : (

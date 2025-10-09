@@ -167,9 +167,9 @@ export default async function GroupsPage({
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4 text-sm text-foreground/70">
                       <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
+                        <Users className="h-4 w-4 text-foreground" />
                         <span>{group.members.length} members</span>
                       </div>
                       {group._count.messages > 0 && (
@@ -180,8 +180,8 @@ export default async function GroupsPage({
                     {group.targetAmount && (
                       <div className="space-y-1">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-muted-foreground">Progress</span>
-                          <span className="font-medium">
+                          <span className="text-foreground/70">Progress</span>
+                          <span className="font-medium text-foreground">
                             ${Number(group.currentAmount).toFixed(2)} / $
                             {Number(group.targetAmount).toFixed(2)}
                           </span>
@@ -196,8 +196,8 @@ export default async function GroupsPage({
                     )}
 
                     {group.occasionDate && (
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4" />
+                      <div className="flex items-center gap-1 text-sm text-foreground/70">
+                        <Calendar className="h-4 w-4 text-foreground" />
                         <span>
                           {new Date(group.occasionDate).toLocaleDateString()}
                         </span>
