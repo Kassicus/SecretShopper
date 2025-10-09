@@ -16,8 +16,10 @@ import Link from "next/link";
 
 export default async function FamilyProfilesPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ familyId: string }>;
+  searchParams: Promise<{ userId?: string }>;
 }) {
   const session = await auth();
 
@@ -26,6 +28,7 @@ export default async function FamilyProfilesPage({
   }
 
   const { familyId } = await params;
+  const { userId } = await searchParams;
 
   const family = await prisma.family.findUnique({
     where: { id: familyId },
@@ -76,6 +79,11 @@ export default async function FamilyProfilesPage({
   // Create a map of userId to profile
   const profileMap = new Map(profiles.map((p) => [p.userId, p]));
 
+  // Filter members if userId is provided
+  const filteredMembers = userId
+    ? family.members.filter((member) => member.user.id === userId)
+    : family.members;
+
   return (
     <div className="container mx-auto p-6">
       <div className="mb-6">
@@ -94,7 +102,7 @@ export default async function FamilyProfilesPage({
       </div>
 
       <div className="space-y-8">
-        {family.members.map((member) => {
+        {filteredMembers.map((member) => {
           const profile = profileMap.get(member.user.id);
           const isCurrentUser = member.user.id === session.user.id;
 
