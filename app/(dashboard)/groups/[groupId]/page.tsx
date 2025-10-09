@@ -86,6 +86,16 @@ export default async function GroupDetailPage({
     redirect("/groups");
   }
 
+  // Update lastReadAt for this user viewing the group
+  await prisma.giftGroupMember.update({
+    where: {
+      id: userMember.id,
+    },
+    data: {
+      lastReadAt: new Date(),
+    },
+  });
+
   const progress = group.targetAmount
     ? (Number(group.currentAmount) / Number(group.targetAmount)) * 100
     : 0;
@@ -95,7 +105,7 @@ export default async function GroupDetailPage({
       <div className="mb-6">
         <Link
           href={`/groups?familyId=${group.familyId}`}
-          className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground cursor-pointer"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to groups
@@ -271,9 +281,9 @@ export default async function GroupDetailPage({
                     id="hasPaid"
                     name="hasPaid"
                     defaultChecked={userMember.hasPaid}
-                    className="h-4 w-4"
+                    className="h-4 w-4 cursor-pointer"
                   />
-                  <Label htmlFor="hasPaid">I have paid this amount</Label>
+                  <Label htmlFor="hasPaid" className="cursor-pointer">I have paid this amount</Label>
                 </div>
                 <Button type="submit">Update Contribution</Button>
               </form>

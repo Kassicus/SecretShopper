@@ -42,7 +42,7 @@ export function MemberCard({
       <CardContent className="flex items-center justify-between p-4">
         <button
           onClick={handleClick}
-          className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 flex-1 text-left hover:opacity-80 transition-opacity cursor-pointer"
         >
           <Avatar>
             <AvatarFallback>

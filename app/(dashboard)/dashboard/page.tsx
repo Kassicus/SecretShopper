@@ -1,14 +1,12 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Users, Gift, Heart } from "lucide-react";
+import { prisma } from "@/lib/prisma";
+import { DashboardFamilyCard } from "@/components/dashboard/dashboard-family-card";
+import { DashboardWishlistCard } from "@/components/dashboard/dashboard-wishlist-card";
+import { DashboardGroupCard } from "@/components/dashboard/dashboard-group-card";
+import { EmptyStateCard } from "@/components/dashboard/empty-state-card";
+import { Users, Heart, Gift } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -17,17 +15,150 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  // Fetch user's families sorted by member count (top 2)
+  const families = await prisma.family.findMany({
+    where: {
+      members: {
+        some: {
+          userId: session.user.id,
+        },
+      },
+    },
+    include: {
+      members: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+        },
+      },
+      _count: {
+        select: {
+          members: true,
+        },
+      },
+    },
+    orderBy: {
+      members: {
+        _count: "desc",
+      },
+    },
+    take: 2,
+  });
+
+  // Fetch user's wishlist items across all families (4-6 items)
+  const rawWishlistItems = await prisma.wishlistItem.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    include: {
+      family: {
+        select: {
+          name: true,
+        },
+      },
+    },
+    orderBy: [
+      { priority: "desc" },
+      { createdAt: "desc" },
+    ],
+    take: 6,
+  });
+
+  // Convert Decimal to number for client components
+  const wishlistItems = rawWishlistItems.map((item) => ({
+    ...item,
+    price: item.price ? Number(item.price) : null,
+  }));
+
+  // Fetch user's gift groups with latest messages (2-4 groups)
+  const giftGroups = await prisma.giftGroup.findMany({
+    where: {
+      members: {
+        some: {
+          userId: session.user.id,
+        },
+      },
+    },
+    include: {
+      members: {
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          lastReadAt: true,
+        },
+      },
+      messages: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 10, // Get last 10 to calculate unread and show previews
+      },
+      _count: {
+        select: {
+          members: true,
+        },
+      },
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+    take: 4,
+  });
+
+  // Process groups to calculate unread counts and get recent messages
+  const processedGroups = giftGroups.map((group) => {
+    const userMember = group.members[0];
+    const lastReadAt = userMember?.lastReadAt;
+
+    // Calculate unread messages
+    const unreadCount = lastReadAt
+      ? group.messages.filter(
+          (msg) => new Date(msg.createdAt) > new Date(lastReadAt)
+        ).length
+      : group.messages.length;
+
+    // Get most recent messages (already sorted desc, so reverse for display)
+    const recentMessages = group.messages.slice(0, 2).reverse();
+
+    return {
+      id: group.id,
+      name: group.name,
+      occasion: group.occasion,
+      memberCount: group._count.members,
+      targetAmount: group.targetAmount ? Number(group.targetAmount) : null,
+      currentAmount: Number(group.currentAmount),
+      recentMessages,
+      unreadCount,
+    };
+  });
+
   return (
     <div className="container mx-auto p-6">
-      {/* Header with solid background */}
+      {/* Header */}
       <div className="mb-12 rounded-2xl bg-accent/10 p-8 border border-accent/20 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold text-primary mb-2">
-              Dashboard
-            </h1>
+            <h1 className="text-4xl font-bold text-primary mb-2">Dashboard</h1>
             <p className="text-lg text-muted-foreground">
-              Welcome back, <span className="font-semibold text-foreground">{session.user.name || session.user.email}</span>!
+              Welcome back,{" "}
+              <span className="font-semibold text-foreground">
+                {session.user.name || session.user.email}
+              </span>
+              !
             </p>
           </div>
           <form
@@ -36,82 +167,122 @@ export default async function DashboardPage() {
               await signOut({ redirectTo: "/" });
             }}
           >
-            <Button type="submit" variant="outline" className="shadow-md hover:shadow-lg transition-all">
+            <Button
+              type="submit"
+              variant="outline"
+              className="shadow-md hover:shadow-lg transition-all"
+            >
               Sign out
             </Button>
           </form>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="relative overflow-hidden group">
-          {/* Solid accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-primary" />
+      {/* Main Content Grid */}
+      <div className="space-y-8">
+        {/* Families Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Users className="h-6 w-6 text-primary" />
+            Your Families
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {families.length > 0 ? (
+              families.map((family) => (
+                <DashboardFamilyCard
+                  key={family.id}
+                  familyId={family.id}
+                  familyName={family.name}
+                  memberCount={family._count.members}
+                  members={family.members}
+                />
+              ))
+            ) : (
+              <EmptyStateCard
+                icon={Users}
+                title="No Families Yet"
+                description="Create or join a family to start tracking preferences and wishlists."
+                ctaText="Go to Families"
+                ctaHref="/family"
+              />
+            )}
+            {families.length === 1 && (
+              <EmptyStateCard
+                icon={Users}
+                title="Join More Families"
+                description="Connect with more family groups to coordinate gifts."
+                ctaText="Go to Families"
+                ctaHref="/family"
+              />
+            )}
+          </div>
+        </section>
 
-          <CardHeader className="bg-primary/5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-                <Users className="h-6 w-6 text-primary" />
+        {/* Wishlist Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Heart className="h-6 w-6 text-accent-foreground" />
+            Your Wishlist
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {wishlistItems.length > 0 ? (
+              wishlistItems.map((item) => (
+                <DashboardWishlistCard
+                  key={item.id}
+                  itemId={item.id}
+                  title={item.title}
+                  price={item.price}
+                  imageUrl={item.imageUrl}
+                  priority={item.priority}
+                  familyName={item.family.name}
+                />
+              ))
+            ) : (
+              <div className="md:col-span-2 lg:col-span-3">
+                <EmptyStateCard
+                  icon={Heart}
+                  title="No Wishlist Items"
+                  description="Add items you'd like to receive as gifts."
+                  ctaText="Add Wishlist Item"
+                  ctaHref="/wishlist/add"
+                />
               </div>
-              <CardTitle className="text-2xl">Families</CardTitle>
-            </div>
-            <CardDescription className="text-base">Manage your family groups</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Create or join a family to start tracking preferences and wishlists.
-            </p>
-            <Button asChild className="w-full shadow-md hover:shadow-lg transition-all">
-              <a href="/family">View Families</a>
-            </Button>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+        </section>
 
-        <Card className="relative overflow-hidden group">
-          {/* Solid accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-accent" />
-
-          <CardHeader className="bg-accent/5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-lg bg-accent/10 border border-accent/20">
-                <Heart className="h-6 w-6 text-accent-foreground" />
-              </div>
-              <CardTitle className="text-2xl">Wishlist</CardTitle>
-            </div>
-            <CardDescription className="text-base">Your wish items</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Add items you'd like to receive as gifts.
-            </p>
-            <Button asChild variant="outline" className="w-full shadow-md hover:shadow-lg transition-all border-accent/30 hover:bg-accent/10">
-              <a href="/wishlist">View Wishlist</a>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="relative overflow-hidden group">
-          {/* Solid accent bar */}
-          <div className="absolute top-0 left-0 right-0 h-2 bg-secondary" />
-
-          <CardHeader className="bg-secondary/5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 rounded-lg bg-secondary/10 border border-secondary/20">
-                <Gift className="h-6 w-6 text-secondary-foreground" />
-              </div>
-              <CardTitle className="text-2xl">Gift Groups</CardTitle>
-            </div>
-            <CardDescription className="text-base">Coordinate group gifts</CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              Pool resources with family to buy bigger gifts together.
-            </p>
-            <Button asChild variant="outline" className="w-full shadow-md hover:shadow-lg transition-all border-secondary/30 hover:bg-secondary/10">
-              <a href="/groups">View Groups</a>
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Gift Groups Section */}
+        <section>
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+            <Gift className="h-6 w-6 text-secondary-foreground" />
+            Gift Groups
+          </h2>
+          <div className="grid gap-6 md:grid-cols-2">
+            {processedGroups.length > 0 ? (
+              processedGroups.map((group) => (
+                <DashboardGroupCard
+                  key={group.id}
+                  groupId={group.id}
+                  groupName={group.name}
+                  occasion={group.occasion}
+                  memberCount={group.memberCount}
+                  targetAmount={group.targetAmount}
+                  currentAmount={group.currentAmount}
+                  recentMessages={group.recentMessages}
+                  unreadCount={group.unreadCount}
+                />
+              ))
+            ) : (
+              <EmptyStateCard
+                icon={Gift}
+                title="No Gift Groups"
+                description="Pool resources with family to buy bigger gifts together."
+                ctaText="Go to Groups"
+                ctaHref="/groups"
+              />
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );
