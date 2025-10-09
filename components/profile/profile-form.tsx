@@ -268,7 +268,7 @@ export function ProfileForm({ familyId, initialData }: ProfileFormProps) {
               {hobbies.map((hobby) => (
                 <div
                   key={hobby}
-                  className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+                  className="flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm text-primary-foreground"
                 >
                   {hobby}
                   <button
@@ -300,7 +300,7 @@ export function ProfileForm({ familyId, initialData }: ProfileFormProps) {
               {interests.map((interest) => (
                 <div
                   key={interest}
-                  className="flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-sm"
+                  className="flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-sm text-primary-foreground"
                 >
                   {interest}
                   <button

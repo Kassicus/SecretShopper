@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,13 +9,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Crown } from "lucide-react";
 import Link from "next/link";
 import { CopyInviteButton } from "@/components/family/copy-invite-button";
 import { InviteByEmailDialog } from "@/components/family/invite-by-email-dialog";
-import { RemoveMemberButton } from "@/components/family/remove-member-button";
+import { MemberCard } from "@/components/family/member-card";
 
 export default async function FamilyDetailPage({
   params,
@@ -91,31 +87,33 @@ export default async function FamilyDetailPage({
           )}
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">Invite Family Members</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <code className="flex-1 rounded bg-muted px-3 py-2 font-mono text-sm">
-                  {family.inviteCode}
-                </code>
-                <CopyInviteButton inviteCode={family.inviteCode} />
+        {isAdmin && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm font-medium">Invite Family Members</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <code className="flex-1 rounded bg-muted px-3 py-2 font-mono text-sm">
+                    {family.inviteCode}
+                  </code>
+                  <CopyInviteButton inviteCode={family.inviteCode} />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Share this code with family members to invite them
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Share this code with family members to invite them
-              </p>
-            </div>
 
-            <div className="pt-2 border-t">
-              <p className="text-sm text-muted-foreground mb-3">
-                Or send an invitation directly via email:
-              </p>
-              <InviteByEmailDialog familyId={familyId} familyName={family.name} />
-            </div>
-          </CardContent>
-        </Card>
+              <div className="pt-2 border-t">
+                <p className="text-sm text-muted-foreground mb-3">
+                  Or send an invitation directly via email:
+                </p>
+                <InviteByEmailDialog familyId={familyId} familyName={family.name} />
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="space-y-6">
@@ -125,82 +123,16 @@ export default async function FamilyDetailPage({
           </h2>
           <div className="space-y-2">
             {family.members.map((member) => (
-              <Card key={member.id}>
-                <CardContent className="flex items-center justify-between p-4">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        {member.user.name?.[0] || member.user.email[0].toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">
-                        {member.user.name || member.user.email}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.user.email}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {member.role === "ADMIN" && (
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Crown className="h-3 w-3" />
-                        Admin
-                      </Badge>
-                    )}
-                    {member.user.id === session.user.id && (
-                      <Badge variant="outline">You</Badge>
-                    )}
-                    {isAdmin && member.user.id !== session.user.id && (
-                      <RemoveMemberButton
-                        familyId={familyId}
-                        memberId={member.id}
-                        memberName={member.user.name || ""}
-                        memberEmail={member.user.email}
-                      />
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <MemberCard
+                key={member.id}
+                member={member}
+                familyId={familyId}
+                isCurrentUser={member.user.id === session.user.id}
+                isAdmin={isAdmin}
+                showEmail={isAdmin}
+              />
             ))}
           </div>
-        </div>
-
-        <Separator />
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Profiles</CardTitle>
-              <CardDescription>
-                View family member preferences and sizes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href={`/family/${familyId}/profiles`}>
-                <Button variant="outline" className="w-full">
-                  View Profiles
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Wishlists</CardTitle>
-              <CardDescription>
-                Browse family member wishlists
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Link href={`/family/${familyId}/wishlists`}>
-                <Button variant="outline" className="w-full">
-                  View Wishlists
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

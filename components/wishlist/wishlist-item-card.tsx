@@ -24,7 +24,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { ExternalLink, Edit, Trash2, Check, ShoppingCart, Gift } from "lucide-react";
+import { ExternalLink, Edit, Trash2, Check, ShoppingCart, Gift, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface WishlistItemCardProps {
   item: {
@@ -54,6 +55,8 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
   const [isDeleting, setIsDeleting] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isImageExpanded, setIsImageExpanded] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const isOwner = item.user.id === currentUserId;
   const isClaimed = !!item.claimedBy;
@@ -97,6 +100,8 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
       });
 
       if (response.ok) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 2000);
         router.refresh();
       }
     } catch (error) {
@@ -141,15 +146,47 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
   };
 
   return (
-    <Card className={`overflow-hidden ${item.purchased && isClaimedByMe ? "opacity-60" : ""}`}>
-      {/* Solid accent bar at top */}
-      <div className={`h-1 ${
-        item.priority === "HIGH"
-          ? "bg-destructive"
-          : item.priority === "MEDIUM"
-          ? "bg-accent"
-          : "bg-secondary"
-      }`} />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      whileHover={{ y: -4, transition: { duration: 0.2 } }}
+    >
+      <Card className={`overflow-hidden relative ${item.purchased && isClaimedByMe ? "opacity-60" : ""}`}>
+        {/* Confetti animation */}
+        <AnimatePresence>
+          {showConfetti && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none z-50 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {[...Array(20)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  className="absolute w-2 h-2 bg-primary rounded-full"
+                  initial={{ x: 0, y: 0, opacity: 1 }}
+                  animate={{
+                    x: (Math.random() - 0.5) * 200,
+                    y: (Math.random() - 0.5) * 200,
+                    opacity: 0,
+                  }}
+                  transition={{ duration: 1, ease: "easeOut" }}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Solid accent bar at top */}
+        <div className={`h-1 ${
+          item.priority === "HIGH"
+            ? "bg-destructive"
+            : item.priority === "MEDIUM"
+            ? "bg-accent"
+            : "bg-secondary"
+        }`} />
 
       <CardHeader className="bg-muted/20">
         <div className="flex items-start justify-between gap-2">
@@ -184,13 +221,63 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
       {(item.description || item.imageUrl || item.price || item.category) && (
         <CardContent className="space-y-4 pt-6">
           {item.imageUrl && (
-            <div className="relative overflow-hidden rounded-lg border-2 border-accent/20 shadow-md">
-              <img
-                src={item.imageUrl}
-                alt={item.title}
-                className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
+            <>
+              <motion.div
+                className="relative overflow-hidden rounded-lg border-2 border-accent/20 shadow-md cursor-pointer group"
+                onClick={() => setIsImageExpanded(true)}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    className="text-white text-sm font-medium"
+                  >
+                    Click to expand
+                  </motion.div>
+                </div>
+              </motion.div>
+
+              {/* Image Modal */}
+              <AnimatePresence>
+                {isImageExpanded && (
+                  <motion.div
+                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={() => setIsImageExpanded(false)}
+                  >
+                    <motion.div
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.8, opacity: 0 }}
+                      transition={{ type: "spring", damping: 25 }}
+                      className="relative max-w-4xl w-full"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="w-full h-auto rounded-lg shadow-2xl"
+                      />
+                      <button
+                        onClick={() => setIsImageExpanded(false)}
+                        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-full p-2 transition-colors"
+                      >
+                        <X className="h-6 w-6" />
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
           )}
           {item.description && (
             <div className="rounded-lg bg-muted/50 p-4 border-l-4 border-accent">
@@ -289,5 +376,6 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
         )}
       </CardFooter>
     </Card>
+    </motion.div>
   );
 }

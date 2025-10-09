@@ -6,11 +6,11 @@ import { cn } from "@/lib/utils";
 import {
   Home,
   Users,
-  Gift,
   User,
   LogOut,
   Menu,
   X,
+  Heart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -25,7 +25,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/family", label: "Family", icon: Users },
-  { href: "/wishlist", label: "My Wishlist", icon: Gift },
+  { href: "/wishlist", label: "My Wishlist", icon: Heart },
   { href: "/profile", label: "Profile", icon: User },
 ];
 
@@ -75,9 +75,6 @@ export function Sidebar({ userName }: { userName?: string | null }) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 border-b border-accent/20 bg-accent/5">
-            <div className="mb-3 p-3 rounded-xl bg-accent/10 border border-accent/30 inline-block shadow-md">
-              <Gift className="h-8 w-8 text-accent-foreground" />
-            </div>
             <h1 className="text-2xl font-bold text-primary">
               Secret Shopper
             </h1>

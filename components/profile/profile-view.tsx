@@ -48,10 +48,14 @@ export function ProfileView({ profile, userName }: ProfileViewProps) {
 
   const formatDate = (date: Date | null) => {
     if (!date) return null;
-    return new Date(date).toLocaleDateString("en-US", {
+    // Use UTC methods to avoid timezone conversion issues
+    const d = new Date(date);
+    const month = d.toLocaleDateString("en-US", {
       month: "long",
-      day: "numeric",
+      timeZone: "UTC",
     });
+    const day = d.getUTCDate();
+    return `${month} ${day}`;
   };
 
   return (
