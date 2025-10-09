@@ -47,8 +47,8 @@ export function DashboardFamilyCard({
                 <Users className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1">
-                <CardTitle className="text-xl">{familyName}</CardTitle>
-                <p className="text-sm text-muted-foreground">
+                <CardTitle className="text-xl text-foreground">{familyName}</CardTitle>
+                <p className="text-sm text-foreground/70">
                   {memberCount} {memberCount === 1 ? "member" : "members"}
                 </p>
               </div>
@@ -57,7 +57,7 @@ export function DashboardFamilyCard({
 
           <CardContent className="pt-4">
             <div className="flex items-center gap-2">
-              <p className="text-sm font-medium text-muted-foreground">Members:</p>
+              <p className="text-sm font-medium text-foreground/70">Members:</p>
               <div className="flex -space-x-2">
                 {displayMembers.map((member) => (
                   <Avatar
@@ -70,8 +70,8 @@ export function DashboardFamilyCard({
                   </Avatar>
                 ))}
                 {remainingCount > 0 && (
-                  <div className="h-8 w-8 rounded-full bg-muted border-2 border-background flex items-center justify-center">
-                    <span className="text-xs font-medium text-muted-foreground">
+                  <div className="h-8 w-8 rounded-full bg-primary/10 border-2 border-background flex items-center justify-center">
+                    <span className="text-xs font-medium text-primary">
                       +{remainingCount}
                     </span>
                   </div>

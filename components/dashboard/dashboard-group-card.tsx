@@ -59,9 +59,9 @@ export function DashboardGroupCard({
           <CardHeader className="bg-secondary/5">
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
-                <CardTitle className="text-lg">{groupName}</CardTitle>
+                <CardTitle className="text-lg text-foreground">{groupName}</CardTitle>
                 {occasion && (
-                  <p className="text-sm text-muted-foreground">{occasion}</p>
+                  <p className="text-sm text-foreground/70">{occasion}</p>
                 )}
               </div>
               {unreadCount > 0 && (
@@ -77,8 +77,8 @@ export function DashboardGroupCard({
             {targetAmount && (
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground">Goal Progress</span>
-                  <span className="font-medium">
+                  <span className="text-foreground/70">Goal Progress</span>
+                  <span className="font-medium text-foreground">
                     ${currentAmount.toFixed(2)} / ${targetAmount.toFixed(2)}
                   </span>
                 </div>
@@ -92,26 +92,26 @@ export function DashboardGroupCard({
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-3 text-sm text-foreground/70">
               <div className="flex items-center gap-1">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4 text-foreground" />
                 <span>{memberCount}</span>
               </div>
               <div className="flex items-center gap-1">
-                <MessageSquare className="h-4 w-4" />
+                <MessageSquare className="h-4 w-4 text-foreground" />
                 <span>{recentMessages.length} messages</span>
               </div>
             </div>
 
             {/* Recent messages preview */}
             {recentMessages.length > 0 && (
-              <div className="pt-2 border-t space-y-2">
+              <div className="pt-2 border-t border-border space-y-2">
                 {recentMessages.slice(0, 2).map((message) => (
                   <div key={message.id} className="text-xs">
-                    <p className="font-medium text-muted-foreground">
+                    <p className="font-medium text-foreground/70">
                       {message.user.name || message.user.email}
                     </p>
-                    <p className="text-foreground/80 line-clamp-2">
+                    <p className="text-foreground/90 line-clamp-2">
                       {truncateMessage(message.content)}
                     </p>
                   </div>

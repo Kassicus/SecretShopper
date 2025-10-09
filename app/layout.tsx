@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Libre_Baskerville, Inter } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
 
 const libreBaskerville = Libre_Baskerville({
   weight: ["400", "700"],
@@ -25,11 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${inter.variable} ${libreBaskerville.variable}`}>
-        <ThemeProvider defaultTheme="light" storageKey="secret-shopper-theme">
-          {children}
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );

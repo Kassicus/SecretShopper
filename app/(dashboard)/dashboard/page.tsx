@@ -182,7 +182,7 @@ export default async function DashboardPage() {
       <div className="space-y-8">
         {/* Families Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-foreground">
             <Users className="h-6 w-6 text-primary" />
             Your Families
           </h2>
@@ -220,8 +220,8 @@ export default async function DashboardPage() {
 
         {/* Wishlist Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <Heart className="h-6 w-6 text-accent-foreground" />
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-foreground">
+            <Heart className="h-6 w-6 text-secondary" />
             Your Wishlist
           </h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -253,8 +253,8 @@ export default async function DashboardPage() {
 
         {/* Gift Groups Section */}
         <section>
-          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
-            <Gift className="h-6 w-6 text-secondary-foreground" />
+          <h2 className="text-2xl font-bold mb-4 flex items-center gap-2 text-foreground">
+            <Gift className="h-6 w-6 text-secondary" />
             Gift Groups
           </h2>
           <div className="grid gap-6 md:grid-cols-2">

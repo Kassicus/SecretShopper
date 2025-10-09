@@ -19,13 +19,13 @@ export function EmptyStateCard({
   ctaHref,
 }: EmptyStateCardProps) {
   return (
-    <Card className="border-dashed border-2 border-muted-foreground/25">
+    <Card className="border-dashed border-2 border-border">
       <CardContent className="flex flex-col items-center justify-center p-8 text-center min-h-[200px]">
-        <div className="rounded-full bg-muted p-3 mb-4">
-          <Icon className="h-8 w-8 text-muted-foreground" />
+        <div className="rounded-full bg-primary/10 p-3 mb-4">
+          <Icon className="h-8 w-8 text-primary" />
         </div>
-        <h3 className="font-semibold text-lg mb-2">{title}</h3>
-        <p className="text-sm text-muted-foreground mb-4">{description}</p>
+        <h3 className="font-semibold text-lg mb-2 text-foreground">{title}</h3>
+        <p className="text-sm text-foreground/70 mb-4">{description}</p>
         <Button asChild variant="outline">
           <Link href={ctaHref}>{ctaText}</Link>
         </Button>
