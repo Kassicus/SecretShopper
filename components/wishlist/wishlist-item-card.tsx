@@ -269,7 +269,7 @@ export function WishlistItemCard({ item, currentUserId, familyId }: WishlistItem
                       />
                       <button
                         onClick={() => setIsImageExpanded(false)}
-                        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-full p-2 transition-colors"
+                        className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white rounded-full p-2 transition-colors cursor-pointer"
                       >
                         <X className="h-6 w-6" />
                       </button>

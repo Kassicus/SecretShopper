@@ -169,12 +169,13 @@ model GiftGroup {
 
 // Gift group members
 model GiftGroupMember {
-  id                 String   @id @default(cuid())
+  id                 String    @id @default(cuid())
   giftGroupId        String
   userId             String
-  contributionAmount Decimal? @db.Decimal(10, 2)
-  hasPaid            Boolean  @default(false)
-  joinedAt           DateTime @default(now())
+  contributionAmount Decimal?  @db.Decimal(10, 2)
+  hasPaid            Boolean   @default(false)
+  lastReadAt         DateTime?
+  joinedAt           DateTime  @default(now())
 
   giftGroup GiftGroup @relation(fields: [giftGroupId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)

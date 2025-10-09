@@ -199,7 +199,7 @@ export function ProfileForm({ familyId, initialData }: ProfileFormProps) {
                 <button
                   type="button"
                   onClick={() => removeColor(color)}
-                  className="ml-1 hover:text-destructive"
+                  className="ml-1 hover:text-destructive cursor-pointer"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -274,7 +274,7 @@ export function ProfileForm({ familyId, initialData }: ProfileFormProps) {
                   <button
                     type="button"
                     onClick={() => removeHobby(hobby)}
-                    className="ml-1 hover:text-destructive"
+                    className="ml-1 hover:text-destructive cursor-pointer"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -306,7 +306,7 @@ export function ProfileForm({ familyId, initialData }: ProfileFormProps) {
                   <button
                     type="button"
                     onClick={() => removeInterest(interest)}
-                    className="ml-1 hover:text-destructive"
+                    className="ml-1 hover:text-destructive cursor-pointer"
                   >
                     <X className="h-3 w-3" />
                   </button>
