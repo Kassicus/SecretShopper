@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Gift Groups - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="glass-card fade-in">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Gift Groups</h1>
+            <a href="{{ url_for('groups.create') }}" class="btn btn-primary">Create Group</a>
+        </div>
+
+        {% if groups %}
+        <div style="display: grid; gap: 1rem;">
+            {% for group in groups %}
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 0.5rem;">{{ group.name }}</h3>
+                        {% if group.description %}
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">{{ group.description }}</p>
+                        {% endif %}
+
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            {% if group.budget %}
+                            <span style="font-weight: 600; color: var(--accent-primary);">
+                                Budget: {{ group.budget|currency }}
+                            </span>
+                            {% endif %}
+
+                            {% if group.revealDate %}
+                            <span style="color: var(--text-muted);">
+                                Reveal: {{ group.revealDate|datetime('%B %d, %Y') }}
+                            </span>
+                            {% endif %}
+
+                            <span class="badge">
+                                {{ group.members|length }} member{% if group.members|length != 1 %}s{% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
+                        <a href="{{ url_for('groups.detail', group_id=group.id) }}" class="btn btn-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted); text-align: center; padding: 3rem;">
+            No gift groups yet. <a href="{{ url_for('groups.create') }}" style="color: var(--accent-primary);">Create your first group!</a>
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

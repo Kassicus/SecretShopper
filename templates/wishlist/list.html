@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}{% if view_user %}{{ view_user.name or view_user.email }}'s Wishlist{% else %}My Wishlist{% endif %} - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="glass-card fade-in">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>{% if view_user %}{{ view_user.name or view_user.email }}'s Wishlist{% else %}My Wishlist{% endif %}</h1>
+            {% if not view_user or view_user.id == current_user.id %}
+            <a href="{{ url_for('wishlist.add') }}" class="btn btn-primary">Add Item</a>
+            {% endif %}
+        </div>
+
+        {% if items %}
+        <div style="display: grid; gap: 1rem;">
+            {% for item in items %}
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 0.5rem;">{{ item.title }}</h3>
+                        {% if item.description %}
+                        <p style="color: var(--text-muted); margin-bottom: 1rem;">{{ item.description }}</p>
+                        {% endif %}
+
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            {% if item.price %}
+                            <span style="font-weight: 600; color: var(--accent-primary); font-size: 1.125rem;">
+                                {{ item.price|currency }}
+                            </span>
+                            {% endif %}
+
+                            <span class="badge">{{ item.priority.value }}</span>
+
+                            {% if item.claimedBy %}
+                                {% if item.claimedBy == current_user.id %}
+                                <span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                                    Claimed by you
+                                </span>
+                                {% else %}
+                                <span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">
+                                    Claimed
+                                </span>
+                                {% endif %}
+                            {% endif %}
+
+                            {% if item.url %}
+                            <a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+                                View Link →
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.5rem; margin-left: 1rem;">
+                        {% if not view_user or view_user.id == current_user.id %}
+                            <!-- Owner actions -->
+                            <a href="{{ url_for('wishlist.edit', item_id=item.id) }}" class="btn btn-secondary btn-sm">
+                                Edit
+                            </a>
+                            <form method="POST" action="{{ url_for('wishlist.delete', item_id=item.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this item?')">
+                                    Delete
+                                </button>
+                            </form>
+                        {% else %}
+                            <!-- Other user viewing: claim/unclaim -->
+                            {% if item.claimedBy == current_user.id %}
+                            <form method="POST" action="{{ url_for('wishlist.unclaim', item_id=item.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-secondary btn-sm">
+                                    Unclaim
+                                </button>
+                            </form>
+                            {% elif not item.claimedBy %}
+                            <form method="POST" action="{{ url_for('wishlist.claim', item_id=item.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Claim
+                                </button>
+                            </form>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-muted); text-align: center; padding: 3rem;">
+            {% if not view_user or view_user.id == current_user.id %}
+                No items in your wishlist yet. <a href="{{ url_for('wishlist.add') }}" style="color: var(--accent-primary);">Add your first item!</a>
+            {% else %}
+                This wishlist is empty.
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.name or profile_user.email }} - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="glass-card fade-in">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>{{ profile_user.name or profile_user.email }}</h1>
+            {% if profile_user.id == current_user.id %}
+            <a href="{{ url_for('profile.edit') }}" class="btn btn-primary">Edit Profile</a>
+            {% endif %}
+        </div>
+
+        <!-- Profile Information -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">Profile Information</h2>
+
+            <div style="display: grid; gap: 1rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Name</label>
+                    <p style="font-size: 1.125rem;">{{ profile_user.name or 'Not set' }}</p>
+                </div>
+
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Email</label>
+                    <p style="font-size: 1.125rem;">{{ profile_user.email }}</p>
+                </div>
+
+                {% if profile and profile.bio %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Bio</label>
+                    <p style="font-size: 1.125rem;">{{ profile.bio }}</p>
+                </div>
+                {% endif %}
+
+                {% if profile and profile.birthday %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Birthday</label>
+                    <p style="font-size: 1.125rem;">{{ profile.birthday|datetime('%B %d, %Y') }}</p>
+                </div>
+                {% endif %}
+
+                {% if profile and profile.address %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Address</label>
+                    <p style="font-size: 1.125rem; white-space: pre-line;">{{ profile.address }}</p>
+                </div>
+                {% endif %}
+
+                {% if profile and profile.preferences %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Preferences</label>
+                    <p style="font-size: 1.125rem; white-space: pre-line;">{{ profile.preferences }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Wishlist Preview -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2>Wishlist</h2>
+                <a href="{{ url_for('wishlist.list', user_id=profile_user.id) }}" class="btn btn-secondary">
+                    View Full Wishlist
+                </a>
+            </div>
+
+            {% if wishlist_items %}
+            <div style="display: grid; gap: 1rem;">
+                {% for item in wishlist_items[:5] %}
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 0.5rem;">{{ item.title }}</h3>
+                    {% if item.description %}
+                    <p style="color: var(--text-muted); margin-bottom: 0.5rem;">{{ item.description }}</p>
+                    {% endif %}
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        {% if item.price %}
+                        <span style="font-weight: 600; color: var(--accent-primary);">
+                            {{ item.price|currency }}
+                        </span>
+                        {% endif %}
+                        <span class="badge">{{ item.priority.value }}</span>
+                        {% if item.claimedBy %}
+                        <span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #22c55e;">Claimed</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                No wishlist items yet
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Create Gift Group - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container container-sm" style="padding: 2rem 0;">
+    <div class="glass-card glass-card-lg fade-in">
+        <h1 class="text-center" style="margin-bottom: 2rem;">Create Gift Group</h1>
+
+        <form method="POST" action="{{ url_for('groups.create') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="form-group">
+                <label for="name" class="form-label">Group Name *</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-input"
+                    placeholder="e.g., Christmas 2024"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                    id="description"
+                    name="description"
+                    class="form-input"
+                    placeholder="What's this gift exchange about?"
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="family_id" class="form-label">Family *</label>
+                <select id="family_id" name="family_id" class="form-input" required>
+                    <option value="">Select a family...</option>
+                    {% for family in families %}
+                    <option value="{{ family.id }}">{{ family.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Members will be from this family</small>
+            </div>
+
+            <div class="form-group">
+                <label for="budget" class="form-label">Budget per Person</label>
+                <input
+                    type="number"
+                    id="budget"
+                    name="budget"
+                    class="form-input"
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="reveal_date" class="form-label">Reveal Date</label>
+                <input
+                    type="date"
+                    id="reveal_date"
+                    name="reveal_date"
+                    class="form-input"
+                >
+                <small class="text-muted">When will gift assignments be revealed?</small>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary btn-full">
+                    Create Group
+                </button>
+                <a href="{{ url_for('groups.list') }}" class="btn btn-secondary btn-full">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

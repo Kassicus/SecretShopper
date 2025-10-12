@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container container-sm" style="padding: 2rem 0;">
+    <div class="glass-card glass-card-lg fade-in">
+        <h1 class="text-center" style="margin-bottom: 2rem;">Edit Profile</h1>
+
+        <form method="POST" action="{{ url_for('profile.edit') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-input"
+                    placeholder="Your Name"
+                    value="{{ current_user.name or '' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-input"
+                    value="{{ current_user.email }}"
+                    disabled
+                    style="opacity: 0.6; cursor: not-allowed;"
+                >
+                <small class="text-muted">Email cannot be changed</small>
+            </div>
+
+            <div class="form-group">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea
+                    id="bio"
+                    name="bio"
+                    class="form-input"
+                    placeholder="Tell us about yourself..."
+                    rows="4"
+                >{{ profile.bio if profile else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="birthday" class="form-label">Birthday</label>
+                <input
+                    type="date"
+                    id="birthday"
+                    name="birthday"
+                    class="form-input"
+                    value="{{ profile.birthday.strftime('%Y-%m-%d') if profile and profile.birthday else '' }}"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="address" class="form-label">Shipping Address</label>
+                <textarea
+                    id="address"
+                    name="address"
+                    class="form-input"
+                    placeholder="Street Address&#10;City, State ZIP"
+                    rows="3"
+                >{{ profile.address if profile else '' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="preferences" class="form-label">Gift Preferences</label>
+                <textarea
+                    id="preferences"
+                    name="preferences"
+                    class="form-input"
+                    placeholder="Colors, sizes, styles, interests..."
+                    rows="4"
+                >{{ profile.preferences if profile else '' }}</textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary btn-full">
+                    Save Changes
+                </button>
+                <a href="{{ url_for('profile.view', user_id=current_user.id) }}" class="btn btn-secondary btn-full">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

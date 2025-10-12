@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}{{ group.name }} - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2rem 0;">
+    <div class="glass-card fade-in">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>{{ group.name }}</h1>
+            <a href="{{ url_for('groups.list') }}" class="btn btn-secondary">Back to Groups</a>
+        </div>
+
+        <!-- Group Details -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">Group Details</h2>
+
+            {% if group.description %}
+            <p style="margin-bottom: 1.5rem; color: var(--text-muted);">{{ group.description }}</p>
+            {% endif %}
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Family</label>
+                    <p style="font-size: 1.125rem; font-weight: 500;">{{ group.family.name }}</p>
+                </div>
+
+                {% if group.budget %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Budget per Person</label>
+                    <p style="font-size: 1.125rem; font-weight: 500; color: var(--accent-primary);">
+                        {{ group.budget|currency }}
+                    </p>
+                </div>
+                {% endif %}
+
+                {% if group.revealDate %}
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Reveal Date</label>
+                    <p style="font-size: 1.125rem; font-weight: 500;">
+                        {{ group.revealDate|datetime('%B %d, %Y') }}
+                    </p>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label style="color: var(--text-muted); font-size: 0.875rem;">Created By</label>
+                    <p style="font-size: 1.125rem; font-weight: 500;">
+                        {{ group.creator.name or group.creator.email }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Members & Assignments -->
+        <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2>Members ({{ group.members|length }})</h2>
+                {% if is_creator and not assignments_made %}
+                <form method="POST" action="{{ url_for('groups.assign', group_id=group.id) }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Generate Secret Santa assignments?')">
+                        Generate Assignments
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            {% if group.members %}
+            <div style="display: grid; gap: 1rem;">
+                {% for member in group.members %}
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin-bottom: 0.25rem;">
+                                {{ member.user.name or member.user.email }}
+                            </h3>
+                            <p style="color: var(--text-muted); font-size: 0.875rem;">
+                                {{ member.user.email }}
+                            </p>
+
+                            {% if member.assignedTo and (member.user.id == current_user.id or is_creator) %}
+                            <p style="margin-top: 0.5rem; color: var(--accent-primary); font-weight: 500;">
+                                {% if member.user.id == current_user.id %}
+                                    You're giving to: {{ member.assignedToUser.name or member.assignedToUser.email }}
+                                {% else %}
+                                    Giving to: {{ member.assignedToUser.name or member.assignedToUser.email }}
+                                {% endif %}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{{ url_for('profile.view', user_id=member.user.id) }}" class="btn btn-secondary btn-sm">
+                                View Profile
+                            </a>
+                            <a href="{{ url_for('wishlist.list', user_id=member.user.id) }}" class="btn btn-primary btn-sm">
+                                View Wishlist
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                No members yet
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
