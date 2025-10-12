@@ -49,11 +49,14 @@ class Config:
         'pool_recycle': 300,
     }
 
-    # Flask-WTF
+    # Flask-WTF CSRF Protection
     WTF_CSRF_ENABLED = True
     WTF_CSRF_TIME_LIMIT = None  # No time limit for CSRF token
+    WTF_CSRF_CHECK_DEFAULT = True
+    WTF_CSRF_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE']
 
     # Session
+    SESSION_TYPE = 'filesystem'  # Use filesystem-based sessions for development
     SESSION_COOKIE_SECURE = os.getenv('ENV') == 'production'
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'

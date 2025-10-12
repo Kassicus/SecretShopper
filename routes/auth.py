@@ -3,6 +3,7 @@ Authentication routes: register, login, logout, verification
 """
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user
+from flask_wtf.csrf import CSRFProtect
 from werkzeug.security import generate_password_hash
 from datetime import datetime
 
@@ -11,6 +12,8 @@ from utils.helpers import generate_cuid, generate_verification_token, create_ver
 from utils.email import send_verification_email, send_welcome_email
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+
+# Note: CSRF protection is handled globally via CSRFProtect in app.py
 
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -95,6 +98,9 @@ def login():
         return redirect(url_for('dashboard.index'))
 
     if request.method == 'POST':
+        print(f"Login attempt - Form data: {request.form}")
+        print(f"CSRF token in form: {request.form.get('csrf_token')}")
+
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         remember = request.form.get('remember', False) == 'on'
