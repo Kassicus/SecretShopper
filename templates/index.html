@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+    <div style="max-width: 800px; text-align: center;" class="fade-in">
+        <!-- Hero Section -->
+        <h1 style="font-size: 3.5rem; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+            Secret Shopper
+        </h1>
+
+        <p style="font-size: 1.5rem; color: var(--text-secondary); margin-bottom: 2rem;">
+            The smart way to gift
+        </p>
+
+        <p style="font-size: 1.125rem; color: var(--text-muted); max-width: 600px; margin: 0 auto 3rem auto; line-height: 1.8;">
+            Track family preferences and coordinate gift purchases with ease.
+            Never forget sizes, colors, or wish items again.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="flex justify-center gap-lg" style="margin-bottom: 4rem;">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">
+                Get Started
+            </a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-glass btn-lg">
+                Sign In
+            </a>
+        </div>
+
+        <!-- Feature Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem;">
+            <div class="glass-card">
+                <h3 style="color: var(--accent-primary);">👨‍👩‍👧‍👦 Family Groups</h3>
+                <p style="color: var(--text-muted);">Create and manage family groups to coordinate gift giving</p>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="color: var(--accent-secondary);">💝 Wishlists</h3>
+                <p style="color: var(--text-muted);">Track what everyone wants and never forget preferences</p>
+            </div>
+
+            <div class="glass-card">
+                <h3 style="color: var(--accent-success);">🎁 Gift Tracking</h3>
+                <p style="color: var(--text-muted);">Claim items and track purchases to avoid duplicates</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

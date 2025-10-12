@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/kasonsuchow/Documents/github/SecretShopper/app/layout\":[\"static/media/e4af272ccee01ff0-s.p.woff2\",\"static/media/b2f48049c9c5c631-s.p.woff2\",\"static/media/fd9b8ea6976d80ff-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"

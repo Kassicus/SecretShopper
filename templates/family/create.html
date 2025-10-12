@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Create Family - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container container-sm" style="padding: 4rem 0;">
+    <div class="glass-card glass-card-lg fade-in">
+        <h1 class="text-center mb-xl">Create a New Family</h1>
+
+        <form method="POST" action="{{ url_for('family.create') }}">
+            <div class="form-group">
+                <label for="name" class="form-label">Family Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-input"
+                    placeholder="The Smith Family"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full btn-lg">
+                Create Family
+            </button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{{ url_for('family.index') }}" class="text-muted">Cancel</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

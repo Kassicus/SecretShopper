@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - SecretShopper{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 3rem 0;">
+    <!-- Header -->
+    <div class="glass-card mb-xl fade-in">
+        <div class="flex justify-between items-center">
+            <div>
+                <h1 style="margin-bottom: 0.5rem; color: var(--accent-primary);">Dashboard</h1>
+                <p class="text-secondary" style="font-size: 1.125rem; margin: 0;">
+                    Welcome back, <span class="font-semibold text-primary">{{ current_user.name or current_user.email }}</span>!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        <div class="glass-card">
+            <h3 style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">YOUR FAMILIES</h3>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--accent-primary); margin: 0;">0</p>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">WISHLIST ITEMS</h3>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--accent-secondary); margin: 0;">0</p>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">GIFT GROUPS</h3>
+            <p style="font-size: 2rem; font-weight: 700; color: var(--accent-success); margin: 0;">0</p>
+        </div>
+    </div>
+
+    <!-- Main Content Sections -->
+    <div style="display: grid; gap: 2rem;">
+        <!-- Families Section -->
+        <section class="glass-card fade-in">
+            <div class="flex justify-between items-center mb-lg">
+                <h2 style="margin: 0;">👨‍👩‍👧‍👦 Your Families</h2>
+                <a href="{{ url_for('family.create') }}" class="btn btn-primary btn-sm">Create Family</a>
+            </div>
+            <p class="text-muted">Create or join a family to start tracking preferences and wishlists.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="{{ url_for('family.index') }}" class="btn btn-glass">Go to Families</a>
+            </div>
+        </section>
+
+        <!-- Wishlist Section -->
+        <section class="glass-card fade-in" style="animation-delay: 0.1s;">
+            <div class="flex justify-between items-center mb-lg">
+                <h2 style="margin: 0;">💝 Your Wishlist</h2>
+                <a href="{{ url_for('wishlist.add') }}" class="btn btn-primary btn-sm">Add Item</a>
+            </div>
+            <p class="text-muted">Add items you'd like to receive as gifts.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="{{ url_for('wishlist.index') }}" class="btn btn-glass">View Wishlist</a>
+            </div>
+        </section>
+
+        <!-- Gift Groups Section -->
+        <section class="glass-card fade-in" style="animation-delay: 0.2s;">
+            <div class="flex justify-between items-center mb-lg">
+                <h2 style="margin: 0;">🎁 Gift Groups</h2>
+                <a href="{{ url_for('groups.create') }}" class="btn btn-primary btn-sm">Create Group</a>
+            </div>
+            <p class="text-muted">Pool resources with family to buy bigger gifts together.</p>
+            <div style="margin-top: 1.5rem;">
+                <a href="{{ url_for('groups.index') }}" class="btn btn-glass">View Groups</a>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
