@@ -3,8 +3,36 @@ Flask application configuration
 """
 import os
 from dotenv import load_dotenv
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 load_dotenv()
+
+
+def clean_database_url(url):
+    """
+    Remove Supabase-specific parameters from DATABASE_URL that psycopg2 doesn't recognize
+
+    Args:
+        url: Database connection URL
+
+    Returns:
+        Cleaned URL without unsupported parameters
+    """
+    if not url:
+        return url
+
+    parsed = urlparse(url)
+    query_params = parse_qs(parsed.query)
+
+    # Remove Supabase-specific parameters that psycopg2 doesn't support
+    unsupported_params = ['pgbouncer']
+    for param in unsupported_params:
+        query_params.pop(param, None)
+
+    # Reconstruct the URL
+    new_query = urlencode(query_params, doseq=True)
+    cleaned = parsed._replace(query=new_query)
+    return urlunparse(cleaned)
 
 
 class Config:
@@ -14,7 +42,7 @@ class Config:
     SECRET_KEY = os.getenv('SECRET_KEY') or 'dev-secret-key-change-in-production'
 
     # Database
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    SQLALCHEMY_DATABASE_URI = clean_database_url(os.getenv('DATABASE_URL'))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
