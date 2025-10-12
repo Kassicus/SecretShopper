@@ -112,7 +112,16 @@ def login():
         # Find user
         user = User.query.filter_by(email=email).first()
 
-        if not user or not user.check_password(password):
+        print(f"User found: {user is not None}")
+        if user:
+            print(f"User ID: {user.id}, Email: {user.email}")
+            print(f"Password check result: {user.check_password(password)}")
+
+        if not user:
+            flash('Invalid email or password', 'error')
+            return render_template('auth/login.html', email=email)
+
+        if not user.check_password(password):
             flash('Invalid email or password', 'error')
             return render_template('auth/login.html', email=email)
 

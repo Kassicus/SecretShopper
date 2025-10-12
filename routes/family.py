@@ -69,7 +69,16 @@ def create():
 def detail(family_id):
     """View family details"""
     family = Family.query.get_or_404(family_id)
-    return render_template('family/detail.html', family=family)
+    members = FamilyMember.query.filter_by(familyId=family_id).all()
+
+    # Check if current user is admin
+    current_member = FamilyMember.query.filter_by(
+        familyId=family_id,
+        userId=current_user.id
+    ).first()
+    is_admin = current_member and current_member.role == Role.ADMIN
+
+    return render_template('family/detail.html', family=family, members=members, is_admin=is_admin)
 
 
 @family_bp.route('/join', methods=['GET', 'POST'])
