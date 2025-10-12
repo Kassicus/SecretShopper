@@ -32,6 +32,10 @@ class Config:
     PERMANENT_SESSION_LIFETIME = 86400  # 24 hours
 
     # Email Configuration
+    # Resend (primary)
+    RESEND_API_KEY = os.getenv('RESEND_API_KEY')
+
+    # SMTP (fallback)
     MAIL_SERVER = os.getenv('SMTP_HOST', 'smtp.gmail.com')
     MAIL_PORT = int(os.getenv('SMTP_PORT', 587))
     MAIL_USE_TLS = True

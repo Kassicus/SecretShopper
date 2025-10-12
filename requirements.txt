@@ -17,6 +17,7 @@ email-validator==2.1.0
 
 # Email
 Flask-Mail==0.9.1
+resend==2.16.0
 
 # Environment
 python-dotenv==1.0.0

@@ -1,11 +1,13 @@
 """
 Email utilities for sending verification and notification emails
+Supports: Resend (primary), SMTP (fallback), Flask-Mail (fallback)
 """
 from flask import current_app, render_template
 from flask_mail import Mail, Message as MailMessage
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
 
 mail = Mail()
 
@@ -17,7 +19,7 @@ def init_mail(app):
 
 def send_email(to, subject, html_body, text_body=None):
     """
-    Send email using Flask-Mail or fallback to SMTP
+    Send email using Resend (primary) or SMTP (fallback)
 
     Args:
         to: Recipient email address
@@ -25,8 +27,18 @@ def send_email(to, subject, html_body, text_body=None):
         html_body: HTML content
         text_body: Plain text content (optional)
     """
+    # Try Resend first if API key is configured
+    resend_api_key = os.getenv('RESEND_API_KEY') or current_app.config.get('RESEND_API_KEY')
+
+    if resend_api_key:
+        try:
+            return send_email_resend(to, subject, html_body, text_body)
+        except Exception as e:
+            current_app.logger.error(f'Resend failed: {e}')
+            # Fall through to SMTP
+
+    # Try Flask-Mail/SMTP as fallback
     try:
-        # Try Flask-Mail first
         msg = MailMessage(
             subject=subject,
             recipients=[to],
@@ -44,6 +56,38 @@ def send_email(to, subject, html_body, text_body=None):
         except Exception as smtp_e:
             current_app.logger.error(f'SMTP fallback failed: {smtp_e}')
             return False
+
+
+def send_email_resend(to, subject, html_body, text_body=None):
+    """
+    Send email using Resend API
+
+    Args:
+        to: Recipient email address
+        subject: Email subject
+        html_body: HTML content
+        text_body: Plain text content (optional)
+    """
+    import resend
+
+    resend_api_key = os.getenv('RESEND_API_KEY') or current_app.config.get('RESEND_API_KEY')
+    resend.api_key = resend_api_key
+
+    sender = os.getenv('SMTP_FROM') or current_app.config.get('MAIL_DEFAULT_SENDER')
+
+    params = {
+        "from": sender,
+        "to": [to],
+        "subject": subject,
+        "html": html_body,
+    }
+
+    if text_body:
+        params["text"] = text_body
+
+    email = resend.Emails.send(params)
+    current_app.logger.info(f'Resend email sent: {email}')
+    return True
 
 
 def send_email_smtp(to, subject, html_body, text_body=None):
