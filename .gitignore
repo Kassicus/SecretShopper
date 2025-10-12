@@ -25,6 +25,11 @@ wheels/
 instance/
 .webassets-cache
 
+# Node.js (legacy from Next.js)
+node_modules/
+.next/
+out/
+
 # Environment
 .env
 .env.local
