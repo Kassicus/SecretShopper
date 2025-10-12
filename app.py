@@ -3,6 +3,7 @@ Main Flask application factory
 """
 from flask import Flask, render_template
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from config import config
 import os
 
@@ -26,6 +27,10 @@ def create_app(config_name=None):
     # Initialize extensions
     from models import db
     db.init_app(app)
+
+    # Initialize CSRF Protection
+    csrf = CSRFProtect()
+    csrf.init_app(app)
 
     # Initialize Flask-Login
     login_manager = LoginManager()

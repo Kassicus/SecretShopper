@@ -8,6 +8,7 @@
         <h1 class="text-center" style="margin-bottom: 2rem;">Create Your Account</h1>
 
         <form method="POST" action="{{ url_for('auth.register') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="form-group">
                 <label for="name" class="form-label">Name</label>
                 <input
